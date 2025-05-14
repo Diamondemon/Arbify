@@ -163,6 +163,7 @@ class ArbImporter
                     || ($messageValue = $this->messageValueRepository->latest($message, $language, $form)) === null
                     || $messageValue->value === null
                 ) {
+                    $message->update(['description'=>$importedMessage['description']]);
                     MessageValue::create([
                         'message_id' => $message->id,
                         'language_id' => $language->id,

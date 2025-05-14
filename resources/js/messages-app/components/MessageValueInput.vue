@@ -7,7 +7,7 @@
 
         <div class="col message-value-form">
             <div class="input-group">
-                <input type="text" :id="label" :class="inputClasses" v-model="value" @blur="onSave"
+                <input type="text" :id="label" :class="inputClasses" :tabindex="tabindex" v-model="value" @blur="onSave"
                        @keypress.enter="onSave">
 
                 <div class="input-group-append">
@@ -59,6 +59,9 @@
                     'message-field',
                     this.state === 'accepted' ? 'is-accepted' : '',
                 ];
+            },
+            tabindex() {
+                return `${this.languageId}`;
             },
             state() {
                 if (this.storedValue && this.storedValue.value === this.value) {

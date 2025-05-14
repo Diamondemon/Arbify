@@ -16,7 +16,9 @@ services:
             DB_PASSWORD: ${DB_PASSWORD}
         volumes:
             - .:/var/www
-
+        networks:
+          - default
+          - mail
     db:
         image: mariadb:10
         restart: unless-stopped
@@ -33,10 +35,15 @@ services:
         image: nginx:1.17-alpine
         restart: unless-stopped
         ports:
-            - 8000:80
+            - 8124:443
         volumes:
             - .:/var/www
             - ./docker/nginx:/etc/nginx/conf.d
 
 volumes:
     db-data:
+
+networks:
+  mail:
+    name: mail
+    external: true
