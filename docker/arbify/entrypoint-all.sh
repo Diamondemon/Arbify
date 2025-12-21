@@ -14,10 +14,15 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
     mysql_pid=$!
     
     # Wait for MySQL to start
-    sleep 5
+    for i in {1..30}; do
+        if mysql -e "SELECT 1" &>/dev/null; then
+            break
+        fi
+        sleep 1
+    done
     
     # Configure root user authentication
-    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED VIA unix_socket OR mysql_native_password USING '';"
+    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED VIA unix_socket OR mysql_native_password USING PASSWORD('');"
     
     # Create database and user
     mysql -e "CREATE DATABASE IF NOT EXISTS ${DB_DATABASE:-arbify};"
@@ -28,21 +33,28 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
     mysql -e "FLUSH PRIVILEGES;"
     
     # Shutdown MySQL
-    mysqladmin -u root shutdown
-    wait $mysql_pid
+    mysqladmin -u root shutdown 2>/dev/null || kill $mysql_pid
+    wait $mysql_pid 2>/dev/null || true
 else
     # Database exists, just ensure root user has correct authentication
     echo "Database exists, configuring authentication..."
     /usr/sbin/mysqld --user=mysql --skip-networking --socket=/var/run/mysqld/mysqld.sock &
     mysql_pid=$!
-    sleep 5
+    
+    # Wait for MySQL to start
+    for i in {1..30}; do
+        if mysql -e "SELECT 1" &>/dev/null; then
+            break
+        fi
+        sleep 1
+    done
     
     # Fix authentication for existing database
-    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED VIA unix_socket OR mysql_native_password USING '';" 2>/dev/null || true
+    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED VIA unix_socket OR mysql_native_password USING PASSWORD('');" 2>/dev/null || true
     mysql -e "FLUSH PRIVILEGES;"
     
-    mysqladmin -u root shutdown
-    wait $mysql_pid
+    mysqladmin -u root shutdown 2>/dev/null || kill $mysql_pid
+    wait $mysql_pid 2>/dev/null || true
 fi
 
 # Ensure proper permissions for Laravel
