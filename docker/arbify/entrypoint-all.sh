@@ -51,6 +51,9 @@ else
     
     # Fix authentication for existing database
     mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED VIA unix_socket OR mysql_native_password USING PASSWORD('');" 2>/dev/null || true
+    
+    # Ensure arbify database exists
+    mysql -e "CREATE DATABASE IF NOT EXISTS ${DB_DATABASE:-arbify};"
     mysql -e "FLUSH PRIVILEGES;"
     
     mysqladmin -u root shutdown 2>/dev/null || kill $mysql_pid
