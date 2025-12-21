@@ -12,31 +12,17 @@ services:
         restart: unless-stopped
         working_dir: /var/www
         environment:
-            DB_USER: ${DB_USERNAME}
+            DB_CONNECTION: mysql
+            DB_HOST: localhost
+            DB_PORT: 3306
+            DB_DATABASE: ${DB_DATABASE:-arbify}
+            DB_USERNAME: ${DB_USERNAME:-root}
             DB_PASSWORD: ${DB_PASSWORD}
-        volumes:
-            - .:/var/www
-
-    db:
-        image: mariadb:10
-        restart: unless-stopped
-        environment:
-            MYSQL_DATABASE: ${DB_DATABASE}
-            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-            MYSQL_PASSWORD: ${DB_PASSWORD}
-            MYSQL_USER: ${DB_USERNAME}
-            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-        volumes:
-            - db-data:/var/lib/mysql
-
-    nginx:
-        image: nginx:1.17-alpine
-        restart: unless-stopped
         ports:
             - 8080:80
         volumes:
+            - db-data:/var/lib/mysql
             - .:/var/www
-            - ./docker/nginx:/etc/nginx/conf.d
 
 volumes:
     db-data:

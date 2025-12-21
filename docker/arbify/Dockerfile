@@ -11,7 +11,10 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     libzip-dev \
-    mariadb-client
+    mariadb-client \
+    mariadb-server \
+    nginx \
+    supervisor
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -42,11 +45,28 @@ WORKDIR /var/www
 COPY --chown=$user:$user . .
 
 # Install composer dependencies
-RUN composer install --no-interaction --optimize-autoloader --no-dev
+RUN composer install --no-interaction --optimize-autoloader
 
 # Install node dependencies and build assets
 RUN npm install && npm run production
 
-USER $user
+# Copy nginx configuration
+RUN rm -f /etc/nginx/sites-enabled/default
+COPY docker/nginx/default.conf /etc/nginx/sites-available/arbify.conf
+RUN ln -s /etc/nginx/sites-available/arbify.conf /etc/nginx/sites-enabled/arbify.conf
 
-CMD ["docker/arbify/entrypoint.sh"]
+# Copy supervisor configuration
+COPY docker/arbify/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Copy entrypoint script
+COPY docker/arbify/entrypoint-all.sh /usr/local/bin/entrypoint-all.sh
+RUN chmod +x /usr/local/bin/entrypoint-all.sh
+
+# Create necessary directories
+RUN mkdir -p /var/lib/mysql /var/run/mysqld /var/log/supervisor && \
+    chown -R mysql:mysql /var/lib/mysql /var/run/mysqld && \
+    chown -R $user:$user /var/www/storage /var/www/bootstrap/cache
+
+EXPOSE 80 3306
+
+CMD ["/usr/local/bin/entrypoint-all.sh"]
