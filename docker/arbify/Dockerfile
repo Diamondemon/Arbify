@@ -1,7 +1,16 @@
 FROM php:7.4-fpm
 
-ARG user
-ARG uid
+ARG user=arbify
+ARG uid=1000
+
+# Environment variables from docker-compose
+ENV DB_CONNECTION=mysql \
+    DB_HOST=localhost \
+    DB_PORT=3306 \
+    DB_DATABASE=arbify \
+    DB_USERNAME=root \
+    DB_PASSWORD="" \
+    DB_SOCKET=/var/run/mysqld/mysqld.sock
 
 RUN apt-get update && apt-get install -y \
     git \
@@ -67,6 +76,13 @@ RUN mkdir -p /var/lib/mysql /var/run/mysqld /var/log/supervisor && \
     chown -R mysql:mysql /var/lib/mysql /var/run/mysqld && \
     chown -R $user:$user /var/www/storage /var/www/bootstrap/cache
 
+# Create volume mount point for MySQL data
+VOLUME ["/var/lib/mysql"]
+
+# Expose ports
 EXPOSE 80 3306
+
+# Set working directory
+WORKDIR /var/www
 
 CMD ["/usr/local/bin/entrypoint-all.sh"]

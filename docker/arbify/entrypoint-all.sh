@@ -30,6 +30,19 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
     # Shutdown MySQL
     mysqladmin -u root shutdown
     wait $mysql_pid
+else
+    # Database exists, just ensure root user has correct authentication
+    echo "Database exists, configuring authentication..."
+    /usr/sbin/mysqld --user=mysql --skip-networking --socket=/var/run/mysqld/mysqld.sock &
+    mysql_pid=$!
+    sleep 5
+    
+    # Fix authentication for existing database
+    mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED VIA unix_socket OR mysql_native_password USING '';" 2>/dev/null || true
+    mysql -e "FLUSH PRIVILEGES;"
+    
+    mysqladmin -u root shutdown
+    wait $mysql_pid
 fi
 
 # Ensure proper permissions for Laravel
