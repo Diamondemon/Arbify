@@ -38,6 +38,15 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
 
 WORKDIR /var/www
 
+# Copy application files
+COPY --chown=$user:$user . .
+
+# Install composer dependencies
+RUN composer install --no-interaction --optimize-autoloader --no-dev
+
+# Install node dependencies and build assets
+RUN npm install && npm run production
+
 USER $user
 
 CMD ["docker/arbify/entrypoint.sh"]
