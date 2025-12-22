@@ -6,7 +6,6 @@ return [
         \Illuminate\Cookie\Middleware\EncryptCookies::class,
         \Illuminate\Session\Middleware\StartSession::class,
         \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        \Arbify\Http\Middleware\LogFilepondRequests::class,
     ],
     
     // Route prefix for FilePond API

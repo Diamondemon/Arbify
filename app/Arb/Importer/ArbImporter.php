@@ -42,40 +42,19 @@ class ArbImporter
      */
     public function import(Project $project, UploadedFile $file, User $importingUser, bool $overrideMessageValues): void
     {
-        \Log::info('ArbImporter: Starting import', [
-            'project' => $project->name,
-            'file' => $file->getClientOriginalName(),
-            'size' => $file->getSize(),
-            'user' => $importingUser->email
-        ]);
-
         $contents = $this->getContents($file);
-        \Log::info('ArbImporter: File contents retrieved', ['length' => strlen($contents)]);
-
         $json = $this->parseJson($contents);
-        \Log::info('ArbImporter: JSON parsed', ['keys_count' => count($json)]);
 
         $language = $this->determineLanguage($json, $file->getClientOriginalName());
-        \Log::info('ArbImporter: Language determined', ['language' => $language]);
-
         $messages = $this->processMessages($json);
-        \Log::info('ArbImporter: Messages processed', ['messages_count' => count($messages)]);
 
         $this->importToDatabase($project, $importingUser, $language, $messages, $overrideMessageValues);
-        \Log::info('ArbImporter: Database import completed');
     }
 
     private function getContents(UploadedFile $file): string
     {
-        \Log::info('ArbImporter: Reading file contents', [
-            'real_path' => $file->getRealPath(),
-            'exists' => file_exists($file->getRealPath()),
-            'readable' => is_readable($file->getRealPath())
-        ]);
-
         $fileContents = file_get_contents($file->getRealPath());
         if ($fileContents === false) {
-            \Log::error('ArbImporter: Failed to read file', ['path' => $file->getRealPath()]);
             throw new ImportException('Error reading file.');
         }
 
@@ -85,20 +64,10 @@ class ArbImporter
 
     private function parseJson(string $contents): array
     {
-        \Log::info('ArbImporter: Parsing JSON', [
-            'content_preview' => substr($contents, 0, 200),
-            'content_length' => strlen($contents)
-        ]);
-
         $json = json_decode($contents, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             $error = json_last_error_msg();
-            \Log::error('ArbImporter: JSON parsing failed', [
-                'error' => $error,
-                'error_code' => json_last_error(),
-                'content' => $contents
-            ]);
             throw new ImportException(
                 'File is not a valid JSON file.',
                 "JSON Error: {$error}"

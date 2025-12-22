@@ -44,57 +44,28 @@ class ImportController extends BaseController
         Filepond $filepond,
         ArbImporter $importer
     ): Response {
-        \Log::info('Import upload started', [
-            'project_id' => $project->id,
-            'user_id' => $request->user()->id,
-            'request_data' => $request->all()
-        ]);
-
         $fileIds = $request->input('files', []);
         $overrideMessageValues = (bool)$request->input('override_message_values');
-
-        \Log::info('Processing files', [
-            'file_ids' => $fileIds,
-            'override' => $overrideMessageValues
-        ]);
 
         foreach ($fileIds as $i => $serverId) {
             $file = null;
             try {
-                \Log::info("Processing file #{$i}", ['server_id' => $serverId]);
-
                 $filePath = $filepond->getPathFromServerId($serverId);
-                \Log::info('FilePond path retrieved', ['path' => $filePath]);
-
                 $disk = config('filepond.temporary_files_disk', 'local');
                 $fullPath = \Illuminate\Support\Facades\Storage::disk($disk)->path($filePath);
                 
-                \Log::info('Full file path', [
-                    'disk' => $disk,
-                    'full_path' => $fullPath,
-                    'exists' => file_exists($fullPath),
-                    'size' => file_exists($fullPath) ? filesize($fullPath) : 0
-                ]);
-
                 // Check if file exists
                 if (!file_exists($fullPath)) {
-                    \Log::error('File not found', ['path' => $fullPath]);
                     throw new ImportException("Uploaded file not found. Please try uploading again.");
                 }
 
                 $fileSize = filesize($fullPath);
                 if ($fileSize === 0) {
-                    \Log::error('File is empty', ['path' => $fullPath]);
                     throw new ImportException("Uploaded file is empty. Please try uploading again.");
                 }
                 
                 // Get original filename from FilePond metadata or use the stored filename
                 $originalName = basename($filePath);
-                \Log::info('File details', [
-                    'original_name' => $originalName,
-                    'size' => $fileSize,
-                    'mime' => mime_content_type($fullPath)
-                ]);
                 
                 // Create UploadedFile instance from the stored file
                 $file = new UploadedFile(
@@ -105,18 +76,8 @@ class ImportController extends BaseController
                     true
                 );
                 
-                \Log::info('Starting import for file', ['name' => $originalName]);
                 $importer->import($project, $file, $request->user(), $overrideMessageValues);
-                \Log::info('Import completed successfully', ['name' => $originalName]);
             } catch (ImportException $e) {
-                \Log::error('Import exception occurred', [
-                    'file_index' => $i,
-                    'server_id' => $serverId,
-                    'message' => $e->getMessage(),
-                    'solution' => $e->getSolution(),
-                    'trace' => $e->getTraceAsString()
-                ]);
-
                 $fileName = $file ? $file->getClientOriginalName() : $serverId;
                 return back()
                     ->withInput()
@@ -128,18 +89,9 @@ class ImportController extends BaseController
                             $e->getSolution()
                         )
                     ]);
-            } catch (\Exception $e) {
-                \Log::error('Unexpected exception during import', [
-                    'file_index' => $i,
-                    'server_id' => $serverId,
-                    'message' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
-                ]);
-                throw $e;
             }
         }
 
-        \Log::info('All files imported successfully');
         return redirect()->route('messages.index', $project)
             ->with('success', 'File(s) successfully imported.');
     }
