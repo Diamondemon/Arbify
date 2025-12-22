@@ -60,7 +60,7 @@ RUN composer install --no-interaction --optimize-autoloader
 RUN npm install && npm run production
 
 # Copy nginx configuration
-RUN rm -f /etc/nginx/sites-enabled/default
+RUN rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default /etc/nginx/conf.d/default.conf
 COPY docker/nginx/default.conf /etc/nginx/sites-available/arbify.conf
 RUN ln -s /etc/nginx/sites-available/arbify.conf /etc/nginx/sites-enabled/arbify.conf
 
