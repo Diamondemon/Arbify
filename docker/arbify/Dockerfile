@@ -77,7 +77,7 @@ RUN mkdir -p /var/lib/mysql /var/run/mysqld /var/log/supervisor && \
     chown -R $user:$user /var/www/storage /var/www/bootstrap/cache
 
 # Create volume mount point for MySQL data
-VOLUME ["/var/lib/mysql"]
+# VOLUME ["/var/lib/mysql"]
 
 # Expose ports
 EXPOSE 80 3306

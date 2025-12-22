@@ -43,3 +43,7 @@ The database is seeded with a pre-verified super administrator account `admin` w
 
 [php-workflow]: https://github.com/Arbify/Arbify/actions?query=workflow%3APHP
 [php-workflow-badge]: https://img.shields.io/github/workflow/status/Arbify/Arbify/PHP
+
+
+Deploy:
+https://railway.com/project/7ee00da4-c953-451a-8424-5c70b57ffc65/logs?environmentId=6eeec85c-230f-4795-ae78-fd01b3fbf4b3
