@@ -2,19 +2,13 @@
 
 namespace Arbify\Http\Requests;
 
-use Albert221\Filepond\FilepondRule;
-use Albert221\Filepond\FilepondSerializer;
-
 class ImportToProject extends AuthorizedFormRequest
 {
-    public function rules(FilepondSerializer $filepondSerializer): array
+    public function rules(): array
     {
         return [
             'files' => 'required|array',
-            'files.*' => [
-                'required',
-                new FilepondRule($filepondSerializer),
-            ],
+            'files.*' => 'required|string',
             'override_message_values' => 'boolean',
         ];
     }

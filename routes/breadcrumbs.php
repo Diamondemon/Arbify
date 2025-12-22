@@ -5,7 +5,7 @@ use Arbify\Models\Message;
 use Arbify\Models\Project;
 use Arbify\Models\ProjectMember;
 use Arbify\Models\User;
-use DaveJamesMiller\Breadcrumbs\BreadcrumbsGenerator as Trail;
+use Diglactic\Breadcrumbs\Generator as Trail;
 
 Breadcrumbs::for('dashboard', function (Trail $trail) {
     $trail->push('Dashboard', route('dashboard'));

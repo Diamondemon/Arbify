@@ -1,4 +1,4 @@
-FROM php:7.4-fpm
+FROM php:8.4-fpm
 
 ARG user=arbify
 ARG uid=1000
@@ -36,7 +36,7 @@ RUN mkdir -p /home/$user/.composer && \
     chown -R $user:$user /home/$user
 
 # Node.js
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
+RUN curl -sL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y nodejs
 
 # Blackfire

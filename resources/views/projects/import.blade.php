@@ -58,13 +58,29 @@
 
 @push('scripts')
     <script>
-        $('#files').filepond({
+        FilePond.setOptions({
             server: {
-                url: '/filepond',
-                headers: {
-                    'Accept': 'application/json, text/plain'
-                }
+                process: {
+                    url: '/filepond/api/process',
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    onload: (response) => response,
+                    onerror: (response) => response,
+                },
+                revert: {
+                    url: '/filepond/api/process',
+                    method: 'DELETE',
+                },
             },
+            allowMultiple: true,
+            instantUpload: true,
+            allowRevert: true,
+        });
+
+        FilePond.create(document.querySelector('#files'), {
+            name: 'file', // This must match config/filepond.php input_name
         });
     </script>
 @endpush

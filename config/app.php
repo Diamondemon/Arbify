@@ -168,7 +168,6 @@ return [
          * Package Service Providers...
          */
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
-        Albert221\Filepond\FilepondServiceProvider::class,
 
         /*
          * Application Service Providers...
