@@ -80,7 +80,7 @@ RUN mkdir -p /var/lib/mysql /var/run/mysqld /var/log/supervisor && \
 # VOLUME ["/var/lib/mysql"]
 
 # Expose ports
-EXPOSE 80 3306
+EXPOSE 8080 3306
 
 # Set working directory
 WORKDIR /var/www
