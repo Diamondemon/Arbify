@@ -3,6 +3,7 @@
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
+use Arbify\Logging\PapertrailHttpHandler;
 
 return [
 
@@ -37,7 +38,7 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single'],
+            'channels' => ['single', 'papertrail'],
             'ignore_exceptions' => false,
         ],
 
@@ -64,11 +65,11 @@ return [
 
         'papertrail' => [
             'driver' => 'monolog',
-            'level' => 'debug',
-            'handler' => SyslogUdpHandler::class,
+            'level' => env('LOG_LEVEL', 'debug'),
+            'handler' => PapertrailHttpHandler::class,
             'handler_with' => [
-                'host' => env('PAPERTRAIL_URL'),
-                'port' => env('PAPERTRAIL_PORT'),
+                'url' => env('PAPERTRAIL_URL'),
+                'token' => env('PAPERTRAIL_TOKEN'),
             ],
         ],
 
