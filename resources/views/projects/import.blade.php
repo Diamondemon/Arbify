@@ -79,8 +79,7 @@
             allowRevert: true,
         });
 
-        FilePond.create(document.querySelector('#files'), {
-            name: 'file', // This must match config/filepond.php input_name
-        });
+        // The field name comes from the input's name="files[]", matching config/filepond.php input_name.
+        FilePond.create(document.querySelector('#files'));
     </script>
 @endpush
