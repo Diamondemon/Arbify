@@ -12,7 +12,7 @@ fi
 # Wait until db is operational
 echo "2/5   Running migrations on database..."
 counter=1
-while ! mysql -h db -u "${DB_USER}" --password="${DB_PASSWORD}" -e "SHOW DATABASES;" > /dev/null 2>&1; do
+while ! mariadb --skip-ssl -h db -u "${DB_USER}" --password="${DB_PASSWORD}" -e "SHOW DATABASES;" > /dev/null 2>&1; do
     sleep 1
     counter=`expr ${counter} + 1`
     if [[ ${counter} -gt 10 ]]; then
